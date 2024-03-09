@@ -1,6 +1,7 @@
 ﻿using Google.Protobuf.Collections;
 using Grpc.Core;
 using Invitation.Command.Abstractions.Persistence;
+using Invitation.Command.Infrastructure.database;
 using Invitation.Command.Test.Helper;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
@@ -52,12 +53,12 @@ namespace Invitation.Command.Test.InvitationServicesTest
                 Id = "2",
                 Name = "PurchaseCards"
             });
-            //using var scope = _factory.Services.CreateScope();
-            //var context = scope.ServiceProvider.GetRequiredService<InvitationDbContext>();
+            using var scope = _factory.Services.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<InvitationDbContext>();
             //var stream = _factory.Services.GetRequiredService<IEventStore>();
             var response = await client.SendInvitationAsync(invitationRequest);
 
-            
+
             //var @events = await stream.GetStreamAsync(response.Id);
 
             //Assert.Single(events);

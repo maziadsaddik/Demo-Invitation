@@ -26,16 +26,12 @@ namespace Invitation.Command.Infrastructure
 
             var messages = events.Select(x => new OutboxMessage(x));
 
-            var Students = new Student();
-            //{
-            //    Id = 1
-            //};
             if (_context is not null)
             {
-                await _context.Student.AddAsync(Students);
-                //await _context.Events.AddRangeAsync(events, cancellationToken);
 
-                //await _context.outboxMessages.AddRangeAsync(messages, cancellationToken);
+                await _context.Events.AddRangeAsync(events, cancellationToken);
+
+                await _context.OutboxMessages.AddRangeAsync(messages, cancellationToken);
 
                 await _context.SaveChangesAsync(cancellationToken);
             }

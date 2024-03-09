@@ -14,7 +14,7 @@ namespace Invitation.Command.Infrastructure.database
         {
             modelBuilder.ApplyConfiguration(new OutboxMessageConfigurations());
             modelBuilder.ApplyConfiguration(new BaseEventConfigurations());
-            //modelBuilder.ApplyConfiguration(new GenericEventConfiguration<SendInvitationEventEntity, InvitationData>());
+            modelBuilder.ApplyConfiguration(new GenericEventConfiguration<InvitationSended, InvitationSendedData>());
             //modelBuilder.ApplyConfiguration(new GenericEventConfiguration<JoinInvitationEventEntity, InvitationData>());
             //modelBuilder.ApplyConfiguration(new GenericEventConfiguration<ChangePermissionsInvitationEventEntity, InvitationData>());
             //modelBuilder.ApplyConfiguration(new GenericEventConfiguration<AcceptInvitationEventEntity, InvitationInfoData>());
