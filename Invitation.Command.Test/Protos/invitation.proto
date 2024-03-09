@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+option csharp_namespace = "Invitation.Command.Test";
+
+package invitation.v1;
+
+// The Invitation service definition.
+service Invitation {
+  // Sends a Invitation
+  rpc SendInvitation(InvitationRequest) returns (Response);
+	rpc Accept(InvitationInfoRequest) returns (Response);
+	rpc Cancel(InvitationInfoRequest) returns (Response);
+	rpc Reject(InvitationInfoRequest) returns (Response);
+	rpc JoinMember(InvitationRequest) returns (Response);
+	rpc RemoveMember(InvitationInfoRequest) returns (Response);
+	rpc LeaveMember(InvitationInfoRequest) returns (Response);
+	rpc ChangePermissions(InvitationRequest) returns (Response);
+}
+
+message InvitationRequest{
+	InvitationInfoRequest invitationInfo = 1;
+	repeated Permissions Permissions = 2;
+}
+
+message Permissions{
+	string id = 1;
+	string name = 2; 
+}
+
+message InvitationInfoRequest{
+	string accountId = 1;
+	string subscriptionId = 2;
+	string UserId = 3;
+	string MemberId = 4;
+}
+
+message Response {
+	string id = 1;
+	string message =2;
+}
