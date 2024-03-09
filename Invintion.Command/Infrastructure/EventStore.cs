@@ -4,6 +4,7 @@ using Invitation.Command.Events;
 using Invitation.Command.Infrastructure.database;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.CompilerServices;
+using System.Threading;
 
 namespace Invitation.Command.Infrastructure
 {
@@ -26,30 +27,19 @@ namespace Invitation.Command.Infrastructure
 
             var messages = events.Select(x => new OutboxMessage(x));
 
-            var Students = new Student();
-            //{
-            //    Id = 1
-            //};
-            if (_context is not null)
-            {
-                await _context.Student.AddAsync(Students);
-                //await _context.Events.AddRangeAsync(events, cancellationToken);
+            await _context.Events.AddRangeAsync(events, cancellationToken);
 
-                //await _context.outboxMessages.AddRangeAsync(messages, cancellationToken);
+            await _context.OutboxMessages.AddRangeAsync(messages, cancellationToken);
 
-                await _context.SaveChangesAsync(cancellationToken);
-            }
-            
-        }
-
-        public Task<List<Event>> GetStreamAsync(Guid aggregateId)
-        {
-            throw new NotImplementedException();
+            await _context.SaveChangesAsync(cancellationToken);
         }
 
         public Task<List<Event>> GetStreamAsync(string aggregateId)
         {
-            throw new NotImplementedException();
+           return _context.Events
+            .Where(x => x.AggregateId == aggregateId)
+            .OrderBy(x => x.Id)
+            .ToListAsync();
         }
     }
 }

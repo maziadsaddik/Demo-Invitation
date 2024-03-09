@@ -11,45 +11,45 @@ namespace Invitation.Command.Services
         public override async Task<Response> SendInvitation(InvitationRequest request, ServerCallContext context)
         {
             var command = request.ToCommand();
-            var id = await mediator.Send(command);
+            var id = await _mediator.Send(command);
             return new Response
             {
                 Message = "Member has Sended.",
                 Id = id
             };
         }
-        //public override async Task<Response> Accept(InvitationInfoRequest request, ServerCallContext context)
-        //{
-        //    //AcceptInvitationCommand acceptInvitation = await request.ConvertTOAcceptInvitationCommand();
-        //    //int id = await mediator.Send(acceptInvitation);
-        //    return new Response
-        //    {
-        //        Message = "Member has Canceled.",
-        //        Id = "10"
-        //    };
-        //}
+        public override async Task<Response> Accept(InvitationInfoRequest request, ServerCallContext context)
+        {
+            var command = request.ToAcceptCommand();
+            var id = await _mediator.Send(command);
+            return new Response
+            {
+                Message = "Member has Canceled.",
+                Id = "10"
+            };
+        }
 
-        //public override async Task<Response> Cancel(InvitationInfoRequest request, ServerCallContext context)
-        //{
-        //    //CancelInvitationCommand cancelInvitation = await request.ConvertTOCancelInvitationCommand();
-        //    //int id = await mediator.Send(cancelInvitation);
-        //    return new Response
-        //    {
-        //        Message = "Member has Canceled.",
-        //        Id = "10"
-        //    };
-        //}
+        public override async Task<Response> Cancel(InvitationInfoRequest request, ServerCallContext context)
+        {
+            var command = request.ToCommand();
+            var id = await _mediator.Send(command);
+            return new Response
+            {
+                Message = "Member has Canceled.",
+                Id = "10"
+            };
+        }
 
-        //public override async Task<Response> Reject(InvitationInfoRequest request, ServerCallContext context)
-        //{
-        //    //RejectInvitationCommand rejectInvitation = await request.ConvertTORejectInvitationCommand();
-        //    //int id = await mediator.Send(rejectInvitation);
-        //    return new Response
-        //    {
-        //        Message = "Member has Canceled.",
-        //        Id = "10"
-        //    };
-        //}
+        public override async Task<Response> Reject(InvitationInfoRequest request, ServerCallContext context)
+        {
+            var command = request.ToRejectCommand();
+            var id = await _mediator.Send(command);
+            return new Response
+            {
+                Message = "Member has Canceled.",
+                Id = "10"
+            };
+        }
 
         //public override async Task<Response> JoinMemberByAdmin(InvitationRequest request, ServerCallContext context)
         //{

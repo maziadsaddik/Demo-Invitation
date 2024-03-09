@@ -1,9 +1,13 @@
-﻿using Google.Protobuf.Collections;
+﻿using Calzolari.Grpc.Net.Client.Validation;
+using Google.Protobuf.Collections;
 using Grpc.Core;
 using Invitation.Command.Abstractions.Persistence;
+using Invitation.Command.Domain.Records;
+using Invitation.Command.Infrastructure.database;
 using Invitation.Command.Test.Helper;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit.Abstractions;
 
@@ -52,76 +56,69 @@ namespace Invitation.Command.Test.InvitationServicesTest
                 Id = "2",
                 Name = "PurchaseCards"
             });
-            //using var scope = _factory.Services.CreateScope();
-            //var context = scope.ServiceProvider.GetRequiredService<InvitationDbContext>();
-            //var stream = _factory.Services.GetRequiredService<IEventStore>();
+            
             var response = await client.SendInvitationAsync(invitationRequest);
 
-            
-            //var @events = await stream.GetStreamAsync(response.Id);
+            using var scope = _factory.Services.CreateScope();
+            var stream = scope.ServiceProvider.GetRequiredService<IEventStore>();
+            var @events = await stream.GetStreamAsync(response.Id);
 
-            //Assert.Single(events);
-            //AssertEquality.OfCreatedEvent(events[0], request, response);
+            Assert.Single(events);
+            AssertEquality.OfSendedEvent(events[0], invitationRequest, response);
         }
-        //[Theory]
-        //[InlineData(false, "Workout", "2022-03-27", "",nameof(InvitationRequest.InvitationInfo.AccountId))]
-        //[InlineData(true, " ", "2022-03-27", "", nameof(InvitationRequest.InvitationInfo.UserId))]
-        //[InlineData(true, "Read a book", "1800-03-27", "", nameof(InvitationRequest.InvitationInfo.MemberId))]
-        //[InlineData(true, "Read a book", "2200-03-27", "", nameof(InvitationRequest.InvitationInfo.SubscriptionId))]
-        //public async Task Create_SendInvalidRequest_ThrowsInvalidArgumentRpcException(
-        //    bool validaccountId,
-        //    string userId,
-        //    string memberId,
-        //    string subscriptionId,
-        //    string errorPropertyName
-        //)
-        //{
-        //    var client = new Invitation.InvitationClient(_factory.CreateGrpcChannel());
+        [Theory]
+        [InlineData(false, true,true, true,true ,nameof(InvitationRequest.InvitationInfo.AccountId))]
+        [InlineData(true, false, true, true, true, nameof(InvitationRequest.InvitationInfo.UserId))]
+        [InlineData(true, true, false, true, true, nameof(InvitationRequest.InvitationInfo.MemberId))]
+        [InlineData(true, true, true, false, true, nameof(InvitationRequest.InvitationInfo.SubscriptionId))]
+        [InlineData(true, true, true, true, false, nameof(InvitationRequest.Permissions))]
+        public async Task Create_SendInvalidRequest_ThrowsInvalidArgumentRpcException(
+            bool validaccountId,
+            bool validuserId,
+            bool validmemberId,
+            bool validsubscriptionId,
+            bool validPermissions,
+            string errorPropertyName
+        )
+        {
+            var client = new Invitation.InvitationClient(_factory.CreateGrpcChannel());
 
-        //    var accountId = validaccountId ? Guid.NewGuid().ToString() : " ";
+            var accountId = validaccountId ? Guid.NewGuid().ToString(): " ";
+            var userId = validuserId ? Guid.NewGuid().ToString() : " ";
+            var memberId = validmemberId ? Guid.NewGuid().ToString() : " ";
+            var subscriptionId = validsubscriptionId ? Guid.NewGuid().ToString() : " ";
+            
 
-        //    var request = new InvitationRequest()
-        //    {
-        //        UserId = userId,
-        //        Title = title,
-        //        DueDate = ProtoConverters.ToUtcTimestamp(dueDateString),
-        //    };
+            var request = new InvitationRequest();
 
-        //    var exception = await Assert.ThrowsAsync<RpcException>(async () => await client.CreateAsync(request));
+            request.InvitationInfo = new InvitationInfoRequest()
+            {
+                AccountId = accountId,
+                UserId = userId,
+                MemberId = memberId,
+                SubscriptionId = subscriptionId,
+            };
+            if (validPermissions)
+            {
+                request.Permissions.Add(new Permissions
+                {
+                    Id = "1",
+                    Name = "Transfer"
+                });
+                request.Permissions.Add(new Permissions
+                {
+                    Id = "2",
+                    Name = "PurchaseCards"
+                });
+            }
+            var exception = await Assert.ThrowsAsync<RpcException>(async () => await client.SendInvitationAsync(request));
 
-        //    Assert.Equal(StatusCode.InvalidArgument, exception.StatusCode);
-        //    Assert.Contains(
-        //        exception.GetValidationErrors(),
-        //        e => e.PropertyName.EndsWith(errorPropertyName)
-        //    );
-        //}
-        //[Fact]
-        //public async Task SendNewInvitation_FirstTime_Successfully()
-        //{
-        //    var client = new Invitation.InvitationClient(_factory.CreateGrpcChannel());
-
-        //InvitationRequest invitationRequest = new InvitationRequest();
-        //invitationRequest.InvitationInfo = new InvitationInfoRequest()
-        //{
-        //    AccountId = "1",
-        //    UserId = "1",
-        //    MemberId = "2",
-        //    SubscriptionId = "90"
-        //};
-        //invitationRequest.Permissions.Add(new Permissions
-        //{
-        //    Id = "1",
-        //    Name = "Transfer"
-        //});
-        //invitationRequest.Permissions.Add(new Permissions
-        //{
-        //    Id = "2",
-        //    Name = "PurchaseCards"
-        //});
-
-        //var response = await client.SendInvitationAsync(invitationRequest);
-
-        //Assert.NotNull(response);
+            Assert.Equal(StatusCode.InvalidArgument, exception.StatusCode);
+            Assert.Contains(
+                exception.GetValidationErrors(),
+                e => e.PropertyName.EndsWith(errorPropertyName)
+            );
+        }
     }
 
 

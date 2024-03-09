@@ -10,6 +10,8 @@ namespace Invitation.Command.Validators
             RuleFor(x => x.InvitationInfo.UserId).NotEmpty();
             RuleFor(x=>x.InvitationInfo.MemberId).NotEmpty();
             RuleFor(x=>x.InvitationInfo.SubscriptionId).NotEmpty();
+            RuleFor(x => x.Permissions).NotEmpty();
+
         }
     }
 }

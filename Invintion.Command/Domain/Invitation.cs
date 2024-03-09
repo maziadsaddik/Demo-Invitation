@@ -4,6 +4,12 @@ using Invitation.Command.Events;
 using Microsoft.Identity.Client;
 using Invitation.Command.Extensions;
 using Invitation.Command.CommandHandlers.Send;
+using MediatR;
+using Invitation.Command.Exceptions;
+using Microsoft.Extensions.Logging;
+using Invitation.Command.CommandHandlers.Cancel;
+using Invitation.Command.CommandHandlers.Accept;
+using Invitation.Command.CommandHandlers.Reject;
 
 namespace Invitation.Command.Domain
 {
@@ -16,13 +22,22 @@ namespace Invitation.Command.Domain
             return Invitation;
         }
 
-        //public bool IsDeleted { get; private set; }
+
+        //public bool IsSended { get; private set; } = false;
         //public int TotalFirstNameChangesToday { get; private set; }
         //public int TotalLastNameChangesToday { get; private set; }
         public string AccountId { get; private set; } = string.Empty;
         public string MemberId { get; private set; } = string.Empty;
         public string UserId { get; private set; } = string.Empty;
         public string? SubscriptionId { get; private set; }
+
+        //public void checkSendInvitation()
+        //{
+        //    if (!IsSended)
+        //    {
+        //        throw new NotFoundException("Customer not found");
+        //    }
+        //}
 
         //public void ChangeName(ChangeCustomerNameCommand command)
         //{
@@ -55,7 +70,18 @@ namespace Invitation.Command.Domain
         //        Version: 1
         //    ));
         //}
-
+        public void CancelInvitation(CancelInvitationCommand command)
+        {
+            ApplyNewChange(command.ToEvent(NextSequence));
+        }
+        public void AcceptInvitation(AcceptInvitationCommand command)
+        {
+            ApplyNewChange(command.ToEvent(NextSequence));
+        }
+         public void RejectInvitation(RejectInvitationCommand command)
+        {
+            ApplyNewChange(command.ToEvent(NextSequence));
+        }
         protected override void Mutate(Event @event)
         {
             switch (@event)
@@ -63,15 +89,15 @@ namespace Invitation.Command.Domain
                 case InvitationSended e:
                     Mutate(e);
                     break;
-                //case CustomerNameChanged e:
-                //    Mutate(e);
-                //    break;
-                //case CustomerContactInfoUpdated e:
-                //    Mutate(e);
-                //    break;
-                //case CustomerDeleted e:
-                //    Mutate(e);
-                //    break;
+                case InvitationCanceled e:
+                    Mutate(e);
+                    break;
+                case InvitationAccepted e:
+                    Mutate(e);
+                    break;
+                case InvitationRejected e:
+                    Mutate(e);
+                    break;
             }
         }
 
@@ -108,15 +134,27 @@ namespace Invitation.Command.Domain
         //    LastName = @event.Data.LastName;
         //}
 
-        //public void Mutate(CustomerContactInfoUpdated @event)
-        //{
-        //    Email = @event.Data.Email;
-        //    Phone = @event.Data.Phone;
-        //}
+        public void Mutate(InvitationAccepted @event)
+        {
+            AccountId = @event.Data.AccountId;
+            MemberId = @event.Data.MemberId;
+            UserId = @event.Data.UserId;
+            SubscriptionId = @event.Data.SubscriptionId;
+        }
+        public void Mutate(InvitationRejected @event)
+        {
+            AccountId = @event.Data.AccountId;
+            MemberId = @event.Data.MemberId;
+            UserId = @event.Data.UserId;
+            SubscriptionId = @event.Data.SubscriptionId;
+        }
 
-        //public void Mutate(CustomerDeleted _)
-        //{
-        //    IsDeleted = true;
-        //}
+        public void Mutate(InvitationCanceled @event)
+        {
+            AccountId = @event.Data.AccountId;
+            MemberId = @event.Data.MemberId;
+            UserId = @event.Data.UserId;
+            SubscriptionId = @event.Data.SubscriptionId;
+        }
     }
 }
