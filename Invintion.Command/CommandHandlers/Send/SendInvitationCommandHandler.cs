@@ -10,9 +10,15 @@ namespace Invitation.Command.CommandHandlers.Send
         private readonly IEventStore _eventStore = eventStore;
         public async Task<string> Handle(SendInvitationCommand command, CancellationToken cancellationToken)
         {
-            var invitation = Invitations.SendInvitation(command);
+            
+            var events = await _eventStore.GetStreamAsync($"{command.MemberId}-{command.subscriptionId}");
+            Invitations invitation = new Invitations();
+            if (events.Count != 0)
+            {
+                invitation = Invitations.LoadFromHistory(events);
+            }
+            invitation.SendInvitation(command);
             await _eventStore.CommitAsync(invitation, cancellationToken);
-
             return invitation.Id;
         }
     }

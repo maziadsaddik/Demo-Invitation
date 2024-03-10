@@ -16,12 +16,10 @@ namespace Invitation.Command.CommandHandlers.Reject
             if (events.Count == 0)
                 throw new NotFoundException("Not Found Invitation");
             var invitation = Invitations.LoadFromHistory(events);
-            //Invitations.Cancel(command);
-            //var invitation = Invitations.SendInvitation();
-            //await _eventStore.CommitAsync(invitation, cancellationToken);
+            invitation.RejectInvitation(command);
+            await _eventStore.CommitAsync(invitation, cancellationToken);
 
-            //return invitation.Id;
-            return "";
+            return invitation.Id;
         }
     }
 }

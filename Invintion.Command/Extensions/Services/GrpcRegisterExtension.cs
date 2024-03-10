@@ -22,10 +22,7 @@ namespace Invitation.Command.Extensions.Services
         {
             services.AddGrpcValidation();
             services.AddValidator<InvitationRequestValidator>();
-            //services.AddValidator<UpdateInfoRequestValidator>();
-            //services.AddValidator<ChangeDueDateRequestValidator>();
-            //services.AddValidator<CompleteRequestValidator>();
-            //services.AddValidator<DeleteRequestValidator>();
+            services.AddValidator<InvitationInfoRequestValidator>();
         }
     }
 }

@@ -25,7 +25,7 @@ namespace Invitation.Command.Services
             return new Response
             {
                 Message = "Member has Canceled.",
-                Id = "10"
+                Id = id
             };
         }
 
@@ -33,10 +33,10 @@ namespace Invitation.Command.Services
         {
             var command = request.ToCommand();
             var id = await _mediator.Send(command);
-            return new Response
-            {
-                Message = "Member has Canceled.",
-                Id = "10"
+        return new Response
+        {
+            Message = "Member has Canceled.",
+            Id = id
             };
         }
 
@@ -46,8 +46,8 @@ namespace Invitation.Command.Services
             var id = await _mediator.Send(command);
             return new Response
             {
-                Message = "Member has Canceled.",
-                Id = "10"
+                Message = "Member has Rejected.",
+                Id = id
             };
         }
 

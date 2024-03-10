@@ -15,72 +15,46 @@ namespace Invitation.Command.Domain
 {
     public class Invitations : Aggregate<Invitations>, IAggregate
     {
-        public static Invitations SendInvitation(SendInvitationCommand command)
+        public void SendInvitation(SendInvitationCommand command)
         {
-            var Invitation = new Invitations();
-            Invitation.ApplyNewChange(command.ToEvent());/*command.ToEvent()*/
-            return Invitation;
+            if (IsSended)
+            {
+                throw new RuleVaildationException("Invitation Is Sended");
+            }
+            ApplyNewChange(command.ToEvent(1));
         }
 
 
-        //public bool IsSended { get; private set; } = false;
-        //public int TotalFirstNameChangesToday { get; private set; }
-        //public int TotalLastNameChangesToday { get; private set; }
+        public bool IsSended { get; private set; } = false;
         public string AccountId { get; private set; } = string.Empty;
         public string MemberId { get; private set; } = string.Empty;
         public string UserId { get; private set; } = string.Empty;
         public string? SubscriptionId { get; private set; }
 
-        //public void checkSendInvitation()
-        //{
-        //    if (!IsSended)
-        //    {
-        //        throw new NotFoundException("Customer not found");
-        //    }
-        //}
-
-        //public void ChangeName(ChangeCustomerNameCommand command)
-        //{
-        //    if (IsDeleted)
-        //        throw new NotFoundException("Customer not found");
-
-        //    if (TotalFirstNameChangesToday >= 3)
-        //        throw new BusinessRuleViolationException("You can only change your first name 3 times per day");
-
-        //    if (TotalLastNameChangesToday >= 5)
-        //        throw new BusinessRuleViolationException("You can only change your last name 5 times per day");
-
-        //    ApplyNewChange(command.ToEvent(NextSequence));
-        //}
-
-        //public void UpdateContactInfo(UpdateCustomerContactInfoCommand command)
-        //{
-        //    if (IsDeleted)
-        //        throw new NotFoundException("Customer not found");
-
-        //    ApplyNewChange(new CustomerContactInfoUpdated(
-        //        AggregateId: command.Id,
-        //        Sequence: Sequence + 1,
-        //        DateTime: DateTime.UtcNow,
-        //        Data: new CustomerContactInfoUpdatedData(
-        //            Email: command.Email,
-        //            Phone: command.Phone
-        //        ),
-        //        UserId: command.UserId,
-        //        Version: 1
-        //    ));
-        //}
         public void CancelInvitation(CancelInvitationCommand command)
         {
+            if (!IsSended)
+            {
+                throw new RuleVaildationException("Invitation not Sended");
+            }
             ApplyNewChange(command.ToEvent(NextSequence));
         }
         public void AcceptInvitation(AcceptInvitationCommand command)
         {
-            ApplyNewChange(command.ToEvent(NextSequence));
+            if (!IsSended)
+            {
+                throw new RuleVaildationException("Invitation not Sended");
+            }
+            ApplyNewChange(command.ToAcceptedEvent(NextSequence));
         }
          public void RejectInvitation(RejectInvitationCommand command)
         {
+            if (!IsSended)
+            {
+                throw new RuleVaildationException("Invitation not Sended");
+            }
             ApplyNewChange(command.ToEvent(NextSequence));
+            
         }
         protected override void Mutate(Event @event)
         {
@@ -108,31 +82,8 @@ namespace Invitation.Command.Domain
             UserId = @event.Data.UserId;
             SubscriptionId = @event.Data.SubscriptionId;
             List<Permission> permissions = new List<Permission>(@event.Data.Permissions.ToList());
+            IsSended = true;
         }
-
-        //public void Mutate(CustomerNameChanged @event)
-        //{
-        //    if (@event.DateTime.Date == DateTime.UtcNow.Date)
-        //    {
-        //        if (FirstName != @event.Data.FirstName)
-        //        {
-        //            TotalFirstNameChangesToday++;
-        //        }
-
-        //        if (LastName != @event.Data.LastName)
-        //        {
-        //            TotalLastNameChangesToday++;
-        //        }
-        //    }
-        //    else
-        //    {
-        //        TotalFirstNameChangesToday = 1;
-        //        TotalLastNameChangesToday = 1;
-        //    }
-
-        //    FirstName = @event.Data.FirstName;
-        //    LastName = @event.Data.LastName;
-        //}
 
         public void Mutate(InvitationAccepted @event)
         {
@@ -147,6 +98,7 @@ namespace Invitation.Command.Domain
             MemberId = @event.Data.MemberId;
             UserId = @event.Data.UserId;
             SubscriptionId = @event.Data.SubscriptionId;
+            IsSended = false;
         }
 
         public void Mutate(InvitationCanceled @event)
@@ -155,6 +107,7 @@ namespace Invitation.Command.Domain
             MemberId = @event.Data.MemberId;
             UserId = @event.Data.UserId;
             SubscriptionId = @event.Data.SubscriptionId;
+            IsSended = false;
         }
     }
 }

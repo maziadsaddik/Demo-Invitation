@@ -9,9 +9,9 @@ namespace Invitation.Command.Extensions
 {
     public static class EventsExtensions
     {
-        public static InvitationSended ToEvent(this SendInvitationCommand command) => new(
+        public static InvitationSended ToEvent(this SendInvitationCommand command, int Sequence) => new(
                 AggregateId: $"{command.MemberId}-{command.subscriptionId}",
-                Sequence: 1,
+                Sequence: Sequence,
                 DateTime: DateTime.UtcNow,
                 Data: new InvitationSendedData(
                     UserId: command.UserId,
@@ -22,7 +22,7 @@ namespace Invitation.Command.Extensions
                 ),
                 Version: 1
             );
-        public static InvitationAccepted ToEvent(this AcceptInvitationCommand command,int Sequence) => new(
+        public static InvitationAccepted ToAcceptedEvent(this AcceptInvitationCommand command,int Sequence) => new(
                 AggregateId: $"{command.MemberId}-{command.subscriptionId}",
                 Sequence: Sequence,
                 DateTime: DateTime.UtcNow,

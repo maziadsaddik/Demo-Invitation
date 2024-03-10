@@ -1,4 +1,5 @@
-﻿using Calzolari.Grpc.Net.Client.Validation;
+﻿using Azure.Core;
+using Calzolari.Grpc.Net.Client.Validation;
 using Google.Protobuf.Collections;
 using Grpc.Core;
 using Invitation.Command.Abstractions.Persistence;
@@ -7,6 +8,7 @@ using Invitation.Command.Infrastructure.database;
 using Invitation.Command.Test.Helper;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit.Abstractions;
@@ -72,7 +74,7 @@ namespace Invitation.Command.Test.InvitationServicesTest
         [InlineData(true, true, false, true, true, nameof(InvitationRequest.InvitationInfo.MemberId))]
         [InlineData(true, true, true, false, true, nameof(InvitationRequest.InvitationInfo.SubscriptionId))]
         [InlineData(true, true, true, true, false, nameof(InvitationRequest.Permissions))]
-        public async Task Create_SendInvalidRequest_ThrowsInvalidArgumentRpcException(
+        public async Task Send_SendInvalidRequest_ThrowsInvalidArgumentRpcException(
             bool validaccountId,
             bool validuserId,
             bool validmemberId,
@@ -119,98 +121,185 @@ namespace Invitation.Command.Test.InvitationServicesTest
                 e => e.PropertyName.EndsWith(errorPropertyName)
             );
         }
+        [Fact]
+        public async Task SendNewInvitation_MemberWassendedAnddoCancaltoInvitationthanSendagain_Successfully()
+        {
+            var client = new Invitation.InvitationClient(_factory.CreateGrpcChannel());
+
+            InvitationRequest invitationRequest = new InvitationRequest();
+            invitationRequest.InvitationInfo = new InvitationInfoRequest()
+            {
+                AccountId = "2",
+                UserId = "2",
+                MemberId = "2",
+                SubscriptionId = "1"
+            };
+            invitationRequest.Permissions.Add(new Permissions
+            {
+                Id = "1",
+                Name = "Transfer"
+            });
+            invitationRequest.Permissions.Add(new Permissions
+            {
+                Id = "2",
+                Name = "PurchaseCards"
+            });
+            await client.SendInvitationAsync(invitationRequest);
+            await client.CancelAsync(invitationRequest.InvitationInfo);
+            var response = await client.SendInvitationAsync(invitationRequest);
+            Assert.NotNull(response);
+
+        }
+        [Fact]
+        public async Task SendNewInvitation_MemberWassendedAnddoRejecttoInvitationthanSendagain_Successfully()
+        {
+            var client = new Invitation.InvitationClient(_factory.CreateGrpcChannel());
+
+            InvitationRequest invitationRequest = new InvitationRequest();
+            invitationRequest.InvitationInfo = new InvitationInfoRequest()
+            {
+                AccountId = "2",
+                UserId = "2",
+                MemberId = "2",
+                SubscriptionId = "1"
+            };
+            invitationRequest.Permissions.Add(new Permissions
+            {
+                Id = "1",
+                Name = "Transfer"
+            });
+            invitationRequest.Permissions.Add(new Permissions
+            {
+                Id = "2",
+                Name = "PurchaseCards"
+            });
+            await client.SendInvitationAsync(invitationRequest);
+            await client.RejectAsync(invitationRequest.InvitationInfo);
+            
+            var response = await client.SendInvitationAsync(invitationRequest);
+            Assert.NotNull(response);
+
+
+        }
+        [Fact]
+        public async Task SendNewInvitation_MemberWassendedInvitationTwice_Exception()
+        {
+            var client = new Invitation.InvitationClient(_factory.CreateGrpcChannel());
+
+            InvitationRequest invitationRequest = new InvitationRequest();
+            invitationRequest.InvitationInfo = new InvitationInfoRequest()
+            {
+                AccountId = "2",
+                UserId = "2",
+                MemberId = "2",
+                SubscriptionId = "1"
+            };
+            invitationRequest.Permissions.Add(new Permissions
+            {
+                Id = "1",
+                Name = "Transfer"
+            });
+            invitationRequest.Permissions.Add(new Permissions
+            {
+                Id = "2",
+                Name = "PurchaseCards"
+            });
+            await client.SendInvitationAsync(invitationRequest);
+            var exception = await Assert.ThrowsAsync<RpcException>(async () => await client.SendInvitationAsync(invitationRequest));
+            Assert.Equal(StatusCode.FailedPrecondition, exception.StatusCode);
+        }
     }
 
 
-        // Joined  => exited => send 
-        //[Fact] 
-        //public async Task SendNewInvitation_MemberWasJoinedAndNeedToRejoinAfterExit_Successfully()
-        //{
-        //    Invitation.InvitationClient client = new Invitation.InvitationClient(_factory.CreateGrpcChannel());
+    // Joined  => exited => send 
+    //[Fact]
+    //public async Task SendNewInvitation_MemberWasJoinedAndNeedToRejoinAfterExit_Successfully()
+    //{
+    //    var client = new Invitation.InvitationClient(_factory.CreateGrpcChannel());
 
-        //    InvitationRequest invitationRequest = new InvitationRequest();
-        //    invitationRequest.InvitationInfo = new InvitationInfoRequest()
-        //    {
-        //        AccountId = 2,
-        //        UserId = 2,
-        //        MemberId = 3,
-        //        SubscriptionId = 1
-        //    };
-        //    invitationRequest.Permissions.Add(new Permissions
-        //    {
-        //        Id = 1,
-        //        Name = "Transfer"
-        //    });
-        //    invitationRequest.Permissions.Add(new Permissions
-        //    {
-        //        Id = 2,
-        //        Name = "PurchaseCards"
-        //    });
-        //    await client.SendInvitationToMemberAsync(invitationRequest);
-        //    await client.AcceptAsync(invitationRequest.InvitationInfo);
-        //    await client.LeaveMemberAsync(invitationRequest.InvitationInfo);
+    //    InvitationRequest invitationRequest = new InvitationRequest();
+    //    invitationRequest.InvitationInfo = new InvitationInfoRequest()
+    //    {
+    //        AccountId = "2",
+    //        UserId = "2",
+    //        MemberId = "2",
+    //        SubscriptionId = "1"
+    //    };
+    //    invitationRequest.Permissions.Add(new Permissions
+    //    {
+    //        Id = "1",
+    //        Name = "Transfer"
+    //    });
+    //    invitationRequest.Permissions.Add(new Permissions
+    //    {
+    //        Id ="2",
+    //        Name = "PurchaseCards"
+    //    });
+    //    await client.SendInvitationAsync(invitationRequest);
+    //    var response = await client.AcceptAsync(invitationRequest.InvitationInfo);
+    //    //await client.LeaveMemberAsync(invitationRequest.InvitationInfo);
 
-        //    var response = await client.JoinMemberByAdminAsync(invitationRequest);
-        //    Assert.NotNull(response);
-        //} 
-        //[Fact] 
-        //public async Task SendNewInvitation_AlreadyExists_Exception(){
-        //    Invitation.InvitationClient client = new Invitation.InvitationClient(_factory.CreateGrpcChannel());
+    //    //var response = await client.JoinMemberByAdminAsync(invitationRequest);
+    //    Assert.NotNull(response);
+    //}
+   // [Fact]
+    //public async Task SendNewInvitation_AlreadyExists_Exception(){
+    //    Invitation.InvitationClient client = new Invitation.InvitationClient(_factory.CreateGrpcChannel());
 
-        //    InvitationRequest invitationRequest = new InvitationRequest();
-        //    invitationRequest.InvitationInfo = new InvitationInfoRequest()
-        //    {
-        //        AccountId = 2,
-        //        UserId = 2,
-        //        MemberId = 3,
-        //        SubscriptionId = 1
-        //    };
-        //    invitationRequest.Permissions.Add(new Permissions
-        //    {
-        //        Id = 1,
-        //        Name = "Transfer"
-        //    });
-        //    invitationRequest.Permissions.Add(new Permissions
-        //    {
-        //        Id = 2,
-        //        Name = "PurchaseCards"
-        //    });
-        //    await client.SendInvitationToMemberAsync(invitationRequest);
-        //    await client.AcceptAsync(invitationRequest.InvitationInfo);
-        //    await Assert.ThrowsAsync<RpcException>(async () =>
-        //    {
-        //        await client.SendInvitationToMemberAsync(invitationRequest);
-        //    });
-        //}
+    //    InvitationRequest invitationRequest = new InvitationRequest();
+    //    invitationRequest.InvitationInfo = new InvitationInfoRequest()
+    //    {
+    //        AccountId = 2,
+    //        UserId = 2,
+    //        MemberId = 3,
+    //        SubscriptionId = 1
+    //    };
+    //    invitationRequest.Permissions.Add(new Permissions
+    //    {
+    //        Id = 1,
+    //        Name = "Transfer"
+    //    });
+    //    invitationRequest.Permissions.Add(new Permissions
+    //    {
+    //        Id = 2,
+    //        Name = "PurchaseCards"
+    //    });
+    //    await client.SendInvitationToMemberAsync(invitationRequest);
+    //    await client.AcceptAsync(invitationRequest.InvitationInfo);
+    //    await Assert.ThrowsAsync<RpcException>(async () =>
+    //    {
+    //        await client.SendInvitationToMemberAsync(invitationRequest);
+    //    });
+    //}
 
-        //// send invite and then need some time to response member (accept | reject)
-        //[Fact] 
-        //public async Task SendNewInvitation_Pinding_Exception(){
-        //    Invitation.InvitationClient client = new Invitation.InvitationClient(_factory.CreateGrpcChannel());
+    //// send invite and then need some time to response member (accept | reject)
+    //[Fact] 
+    //public async Task SendNewInvitation_Pinding_Exception(){
+    //    Invitation.InvitationClient client = new Invitation.InvitationClient(_factory.CreateGrpcChannel());
 
-        //    InvitationRequest invitationRequest = new InvitationRequest();
-        //    invitationRequest.InvitationInfo = new InvitationInfoRequest()
-        //    {
-        //        AccountId = 2,
-        //        UserId = 2,
-        //        MemberId = 3,
-        //        SubscriptionId = 1
-        //    };
-        //    invitationRequest.Permissions.Add(new Permissions
-        //    {
-        //        Id = 1,
-        //        Name = "Transfer"
-        //    });
-        //    invitationRequest.Permissions.Add(new Permissions
-        //    {
-        //        Id = 2,
-        //        Name = "PurchaseCards"
-        //    });
-        //    await client.SendInvitationToMemberAsync(invitationRequest);
-        //    await Assert.ThrowsAsync<RpcException>(async () =>
-        //    {
-        //        await client.SendInvitationToMemberAsync(invitationRequest);
-        //    });
-        //}
+    //    InvitationRequest invitationRequest = new InvitationRequest();
+    //    invitationRequest.InvitationInfo = new InvitationInfoRequest()
+    //    {
+    //        AccountId = 2,
+    //        UserId = 2,
+    //        MemberId = 3,
+    //        SubscriptionId = 1
+    //    };
+    //    invitationRequest.Permissions.Add(new Permissions
+    //    {
+    //        Id = 1,
+    //        Name = "Transfer"
+    //    });
+    //    invitationRequest.Permissions.Add(new Permissions
+    //    {
+    //        Id = 2,
+    //        Name = "PurchaseCards"
+    //    });
+    //    await client.SendInvitationToMemberAsync(invitationRequest);
+    //    await Assert.ThrowsAsync<RpcException>(async () =>
+    //    {
+    //        await client.SendInvitationToMemberAsync(invitationRequest);
+    //    });
+    //}
     //}
 }

@@ -34,6 +34,13 @@ namespace Invitation.Command.Infrastructure
             await _context.SaveChangesAsync(cancellationToken);
         }
 
+        public Task<Event?> GetLastEventByAggregateId(string aggregateId)
+        {
+           return  _context.Events
+                   .Where(@event => @event.AggregateId == aggregateId)
+                   .OrderBy(@event => @event.Sequence).LastOrDefaultAsync();
+        }
+
         public Task<List<Event>> GetStreamAsync(string aggregateId)
         {
            return _context.Events

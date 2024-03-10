@@ -12,8 +12,8 @@ namespace Invitation.Command.CommandHandlers.Cancel
         private readonly IEventStore _eventStore = eventStore;
         public async Task<string> Handle(CancelInvitationCommand command, CancellationToken cancellationToken)
         {
-            var events = await _eventStore.GetStreamAsync($"{command.MemberId}-{command.subscriptionId}");
 
+            var events = await _eventStore.GetStreamAsync($"{command.MemberId}-{command.subscriptionId}");
             if (events.Count == 0)
                 throw new NotFoundException("Not Found Invitation");
             var invitation = Invitations.LoadFromHistory(events);
