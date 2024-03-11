@@ -23,17 +23,14 @@ namespace Invitation.Command.Infrastructure
 
         public async Task CommitAsync(IAggregate aggregate, CancellationToken cancellationToken)
         {
-            var events =aggregate.GetUncommittedEvents();
+            var events = aggregate.GetUncommittedEvents();
 
             var messages = events.Select(x => new OutboxMessage(x));
-
             await _context.Events.AddRangeAsync(events, cancellationToken);
-
             await _context.OutboxMessages.AddRangeAsync(messages, cancellationToken);
-
             await _context.SaveChangesAsync(cancellationToken);
-        }
 
+        }
         public Task<Event?> GetLastEventByAggregateId(string aggregateId)
         {
            return  _context.Events

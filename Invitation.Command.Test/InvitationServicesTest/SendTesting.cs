@@ -4,6 +4,7 @@ using Google.Protobuf.Collections;
 using Grpc.Core;
 using Invitation.Command.Abstractions.Persistence;
 using Invitation.Command.Domain.Records;
+
 using Invitation.Command.Infrastructure.database;
 using Invitation.Command.Test.Helper;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -63,7 +64,7 @@ namespace Invitation.Command.Test.InvitationServicesTest
 
             using var scope = _factory.Services.CreateScope();
             var stream = scope.ServiceProvider.GetRequiredService<IEventStore>();
-            var @events = await stream.GetStreamAsync(response.Id);
+            var events = await stream.GetStreamAsync(response.Id);
 
             Assert.Single(events);
             AssertEquality.OfSendedEvent(events[0], invitationRequest, response);

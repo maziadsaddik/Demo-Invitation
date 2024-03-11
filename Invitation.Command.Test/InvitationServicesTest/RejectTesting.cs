@@ -57,9 +57,9 @@ namespace Invitation.Command.Test.InvitationServicesTest
             var response = await client.RejectAsync(invitationRequest.InvitationInfo);
             using var scope = _factory.Services.CreateScope();
             var stream = scope.ServiceProvider.GetRequiredService<IEventStore>();
-            var @events = await stream.GetStreamAsync(response.Id);
+            var events = await stream.GetStreamAsync(response.Id);
 
-            Assert.Equal(2, @events.Count());
+            Assert.Equal(2, events.Count());
             AssertEquality.OfRejectedEvent(events[1], invitationRequest.InvitationInfo, response, expectedSequence: 2);
         }
         [Theory]
