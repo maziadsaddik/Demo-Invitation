@@ -101,6 +101,37 @@ namespace Invitation.Command.Test.InvitationServicesTest
                 e => e.PropertyName.EndsWith(errorPropertyName)
             );
         }
+        [Fact]
+        public async Task RejectInvitation_MemberSendedThanAccpetedToInvitationThanRejected_Exception()
+        {
+            Invitation.InvitationClient client = new Invitation.InvitationClient(_factory.CreateGrpcChannel());
+
+            InvitationRequest invitationRequest = new InvitationRequest();
+            invitationRequest.InvitationInfo = new InvitationInfoRequest()
+            {
+                AccountId = "2",
+                UserId = "2",
+                MemberId = "3",
+                SubscriptionId = "91"
+            };
+            invitationRequest.Permissions.Add(new Permissions
+            {
+                Id = "1",
+                Name = "Transfer"
+            });
+            invitationRequest.Permissions.Add(new Permissions
+            {
+                Id = "2",
+                Name = "PurchaseCards"
+            });
+
+            await client.SendInvitationAsync(invitationRequest);
+            await client.AcceptAsync(invitationRequest.InvitationInfo);
+            await Assert.ThrowsAsync<RpcException>(async () =>
+            {
+                await client.RejectAsync(invitationRequest.InvitationInfo);
+            });
+        }
         //[Fact]
         //public async Task RejectInvitation_InvitationHasSended_Successfully()
         //{
@@ -147,36 +178,6 @@ namespace Invitation.Command.Test.InvitationServicesTest
         //    });
         //}
 
-        [Fact]
-        public async Task RejectInvitation_MemberIsAccepted_Exception()
-        {
-            Invitation.InvitationClient client = new Invitation.InvitationClient(_factory.CreateGrpcChannel());
 
-            InvitationRequest invitationRequest = new InvitationRequest();
-            invitationRequest.InvitationInfo = new InvitationInfoRequest()
-            {
-                AccountId = "2",
-                UserId = "2",
-                MemberId = "3",
-                SubscriptionId = "91"
-            };
-            invitationRequest.Permissions.Add(new Permissions
-            {
-                Id = "1",
-                Name = "Transfer"
-            });
-            invitationRequest.Permissions.Add(new Permissions
-            {
-                Id = "2",
-                Name = "PurchaseCards"
-            });
-
-            await client.SendInvitationAsync(invitationRequest);
-            await client.AcceptAsync(invitationRequest.InvitationInfo);
-            await Assert.ThrowsAsync<RpcException>(async () =>
-            {
-                await client.RejectAsync(invitationRequest.InvitationInfo);
-            });
-        }
     }
 }

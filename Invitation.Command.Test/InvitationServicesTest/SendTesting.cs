@@ -122,7 +122,7 @@ namespace Invitation.Command.Test.InvitationServicesTest
             );
         }
         [Fact]
-        public async Task SendNewInvitation_MemberWassendedAnddoCancaltoInvitationthanSendagain_Successfully()
+        public async Task Send_MemberWassendedAnddoCancaltoInvitationthanSendagain_Successfully()
         {
             var client = new Invitation.InvitationClient(_factory.CreateGrpcChannel());
 
@@ -151,7 +151,7 @@ namespace Invitation.Command.Test.InvitationServicesTest
 
         }
         [Fact]
-        public async Task SendNewInvitation_MemberWassendedAnddoRejecttoInvitationthanSendagain_Successfully()
+        public async Task Send_MemberSendedThanRejectToInvitationThanSendAgain_Successfully()
         {
             var client = new Invitation.InvitationClient(_factory.CreateGrpcChannel());
 
@@ -180,7 +180,7 @@ namespace Invitation.Command.Test.InvitationServicesTest
             Assert.NotNull(response);
         }
         [Fact]
-        public async Task SendNewInvitation_MemberWassendedInvitationTwice_Exception()
+        public async Task Send_MemberSendedInvitationTwice_Exception()
         {
             var client = new Invitation.InvitationClient(_factory.CreateGrpcChannel());
 
@@ -207,7 +207,7 @@ namespace Invitation.Command.Test.InvitationServicesTest
             Assert.Equal(StatusCode.FailedPrecondition, exception.StatusCode);
         }
         [Fact]
-        public async Task SendNewInvitation_MemberWassendedAnddoAccepttoInvitationthanSendagain_Exception()
+        public async Task Send_MemberSendedAndDoAcceptToInvitationThanSendAgain_Exception()
         {
             var client = new Invitation.InvitationClient(_factory.CreateGrpcChannel());
 

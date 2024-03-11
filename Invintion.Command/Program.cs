@@ -16,7 +16,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddGrpcWithValidators();
 builder.Services.AddMediatR(o => o.RegisterServicesFromAssemblyContaining<Program>());
 builder.Services.AddDbContext<InvitationDbContext>(
-   o => o.UseSqlServer("")
+   o => o.UseSqlServer(""),ServiceLifetime.Transient
     );
 builder.Services.AddScoped<IEventStore, EventStore>();
 //builder.Services.AddSingleton(new ServiceBusClient(""));

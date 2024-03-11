@@ -41,7 +41,7 @@ namespace Invitation.Command.Domain
 
         public void CancelInvitation(CancelInvitationCommand command)
         {
-            if (!IsSended)
+            if (!IsSended || IsAccepted)
             {
                 throw new RuleVaildationException("Invitation not Sended");
             }
@@ -93,7 +93,6 @@ namespace Invitation.Command.Domain
             List<Permission> permissions = new List<Permission>(@event.Data.Permissions.ToList());
             IsSended = true;
             CountInvitationSended= true;
-            IsAccepted = false;
         }
 
         public void Mutate(InvitationAccepted @event)
@@ -112,7 +111,6 @@ namespace Invitation.Command.Domain
             UserId = @event.Data.UserId;
             SubscriptionId = @event.Data.SubscriptionId;
             IsSended = false;
-            IsAccepted = false;
         }
 
         public void Mutate(InvitationCanceled @event)
@@ -122,7 +120,6 @@ namespace Invitation.Command.Domain
             UserId = @event.Data.UserId;
             SubscriptionId = @event.Data.SubscriptionId;
             IsSended = false;
-            IsAccepted = false;
         }
     }
 }

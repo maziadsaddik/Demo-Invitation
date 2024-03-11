@@ -72,7 +72,7 @@ namespace Invitation.Command.Test.InvitationServicesTest
         [InlineData(true, true, false, true, nameof(InvitationRequest.InvitationInfo.MemberId))]
         [InlineData(true, true, true, false, nameof(InvitationRequest.InvitationInfo.SubscriptionId))]
 
-        public async Task Send_SendInvalidRequest_ThrowsInvalidArgumentRpcException(
+        public async Task Cancel_SendInvalidRequest_ThrowsInvalidArgumentRpcException(
             bool validaccountId,
             bool validuserId,
             bool validmemberId,

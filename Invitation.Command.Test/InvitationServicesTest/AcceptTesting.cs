@@ -23,7 +23,7 @@ namespace Invitation.Command.Test.InvitationServicesTest
         [InlineData("0558047", "1", "2", "90")]
         [InlineData("0558045", "2", "3", "19")]
         [InlineData("0558048", "1", "3", "50")]
-        public async Task Reject_SendValidRequest_InvitationRejectedEventSaved(
+        public async Task Accept_SendValidRequest_InvitationRejectedEventSaved(
            string accountId,
            string userId,
        string memberId,
