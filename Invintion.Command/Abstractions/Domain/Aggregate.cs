@@ -62,8 +62,8 @@ namespace Invitation.Command.Abstractions.Domain
             if (Id == string.Empty)
                 throw new InvalidOperationException("Id == string.Empty");
 
-            //if (@event.Sequence != Sequence)
-            //    throw new InvalidOperationException("@event.Sequence != Sequence");
+            if (@event.Sequence != Sequence)
+                throw new InvalidOperationException("@event.Sequence != Sequence");
         }
 
         protected abstract void Mutate(Event @event);

@@ -21,11 +21,19 @@ namespace Invitation.Command.Domain
             {
                 throw new RuleVaildationException("Invitation Is Sended");
             }
-            ApplyNewChange(command.ToEvent(1));
+            if(!CountInvitationSended) 
+            {
+                ApplyNewChange(command.ToEvent(1));
+                return;
+            }
+            ApplyNewChange(command.ToEvent(NextSequence));
         }
 
 
         public bool IsSended { get; private set; } = false;
+
+        public bool IsAccepted { get; private set; } = false;  
+        public bool CountInvitationSended { get; private set; } = false;
         public string AccountId { get; private set; } = string.Empty;
         public string MemberId { get; private set; } = string.Empty;
         public string UserId { get; private set; } = string.Empty;
@@ -46,10 +54,11 @@ namespace Invitation.Command.Domain
                 throw new RuleVaildationException("Invitation not Sended");
             }
             ApplyNewChange(command.ToAcceptedEvent(NextSequence));
+
         }
          public void RejectInvitation(RejectInvitationCommand command)
         {
-            if (!IsSended)
+            if (!IsSended || IsAccepted)
             {
                 throw new RuleVaildationException("Invitation not Sended");
             }
@@ -83,6 +92,8 @@ namespace Invitation.Command.Domain
             SubscriptionId = @event.Data.SubscriptionId;
             List<Permission> permissions = new List<Permission>(@event.Data.Permissions.ToList());
             IsSended = true;
+            CountInvitationSended= true;
+            IsAccepted = false;
         }
 
         public void Mutate(InvitationAccepted @event)
@@ -91,6 +102,8 @@ namespace Invitation.Command.Domain
             MemberId = @event.Data.MemberId;
             UserId = @event.Data.UserId;
             SubscriptionId = @event.Data.SubscriptionId;
+            IsSended = true;
+            IsAccepted = true;
         }
         public void Mutate(InvitationRejected @event)
         {
@@ -99,6 +112,7 @@ namespace Invitation.Command.Domain
             UserId = @event.Data.UserId;
             SubscriptionId = @event.Data.SubscriptionId;
             IsSended = false;
+            IsAccepted = false;
         }
 
         public void Mutate(InvitationCanceled @event)
@@ -108,6 +122,7 @@ namespace Invitation.Command.Domain
             UserId = @event.Data.UserId;
             SubscriptionId = @event.Data.SubscriptionId;
             IsSended = false;
+            IsAccepted = false;
         }
     }
 }

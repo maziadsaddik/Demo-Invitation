@@ -178,8 +178,6 @@ namespace Invitation.Command.Test.InvitationServicesTest
             
             var response = await client.SendInvitationAsync(invitationRequest);
             Assert.NotNull(response);
-
-
         }
         [Fact]
         public async Task SendNewInvitation_MemberWassendedInvitationTwice_Exception()
@@ -205,6 +203,34 @@ namespace Invitation.Command.Test.InvitationServicesTest
                 Name = "PurchaseCards"
             });
             await client.SendInvitationAsync(invitationRequest);
+            var exception = await Assert.ThrowsAsync<RpcException>(async () => await client.SendInvitationAsync(invitationRequest));
+            Assert.Equal(StatusCode.FailedPrecondition, exception.StatusCode);
+        }
+        [Fact]
+        public async Task SendNewInvitation_MemberWassendedAnddoAccepttoInvitationthanSendagain_Exception()
+        {
+            var client = new Invitation.InvitationClient(_factory.CreateGrpcChannel());
+
+            InvitationRequest invitationRequest = new InvitationRequest();
+            invitationRequest.InvitationInfo = new InvitationInfoRequest()
+            {
+                AccountId = "2",
+                UserId = "2",
+                MemberId = "2",
+                SubscriptionId = "1"
+            };
+            invitationRequest.Permissions.Add(new Permissions
+            {
+                Id = "1",
+                Name = "Transfer"
+            });
+            invitationRequest.Permissions.Add(new Permissions
+            {
+                Id = "2",
+                Name = "PurchaseCards"
+            });
+            await client.SendInvitationAsync(invitationRequest);
+            await client.AcceptAsync(invitationRequest.InvitationInfo);
             var exception = await Assert.ThrowsAsync<RpcException>(async () => await client.SendInvitationAsync(invitationRequest));
             Assert.Equal(StatusCode.FailedPrecondition, exception.StatusCode);
         }
