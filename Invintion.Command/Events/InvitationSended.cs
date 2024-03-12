@@ -14,7 +14,7 @@ namespace Invitation.Command.Events
 
         public record InvitationSendedData(
         string UserId,
-        string? SubscriptionId,
+        string SubscriptionId,
         string MemberId,
         string AccountId ,
         List<Permission> Permissions

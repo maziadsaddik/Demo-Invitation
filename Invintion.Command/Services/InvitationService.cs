@@ -51,48 +51,49 @@ namespace Invitation.Command.Services
             };
         }
 
-        //public override async Task<Response> JoinMemberByAdmin(InvitationRequest request, ServerCallContext context)
-        //{
-        //    //JoinInvitationCommand joinInvitationCommand = await request.ConvertTOJoinInvitationCommand();
-        //    //int id = await mediator.Send(joinInvitationCommand);
-        //    return new Response
-        //    {
-        //        Message = "Member has Canceled.",
-        //        Id = "10"
-        //    };
-        //}
+        public override async Task<Response> JoinMember(InvitationRequest request, ServerCallContext context)
+        {
+            
+            var command = request.ToJoinCommand();
+            var id = await _mediator.Send(command);
+            return new Response
+            {
+                Message = "Join Succefully",
+                Id = id
+            };
+        }
 
-        //public override async Task<Response> ChangePermissions(InvitationRequest request, ServerCallContext context)
-        //{
-        //    //ChangePermissionInvitationCommand joinInvitationCommand = await request.ConvertTOChangePermissionInvitationCommand();
-        //    //int id = await mediator.Send(joinInvitationCommand);
-        //    return new Response
-        //    {
-        //        Message = "Member has Canceled.",
-        //        Id = "10"
-        //    };
-        //}
+        public override async Task<Response> ChangePermissions(InvitationRequest request, ServerCallContext context)
+        {
+            var command = request.TochangePermissionCommand();
+            var id = await _mediator.Send(command);
+            return new Response
+            {
+                Message = "Change Permissions Succefully",
+                Id = id
+            };
+        }
 
-        //public override async Task<Response> LeaveMember(InvitationInfoRequest request, ServerCallContext context)
-        //{
-        //    //LeaveInvitationCommand leaveInvitation = await request.ConvertTOLeaveInvitationCommand();
-        //    //int id = await mediator.Send(leaveInvitation);
-        //    return new Response
-        //    {
-        //        Message = "Member has Canceled.",
-        //        Id = "10"
-        //    };
-        //}
+        public override async Task<Response> LeaveMember(InvitationInfoRequest request, ServerCallContext context)
+        {
+            var command = request.ToLeaveCommand();
+            var id = await _mediator.Send(command);
+            return new Response
+            {
+                Message = "Member has Leaved.",
+                Id = id
+            };
+        }
 
-        //public override async Task<Response> RemoveMember(InvitationInfoRequest request, ServerCallContext context)
-        //{
-        //    //RemoveInvitationCommand rejectInvitation = await request.ConvertTORemoveInvitationCommand();
-        //    //int id = await mediator.Send(rejectInvitation);
-        //    return new Response
-        //    {
-        //        Message = "Member has Canceled.",
-        //        Id = "10"
-        //    };
-        //}
+        public override async Task<Response> RemoveMember(InvitationInfoRequest request, ServerCallContext context)
+        {
+            var command = request.ToRemoveCommand();
+            var id = await _mediator.Send(command);
+            return new Response
+            {
+                Message = "Member has Canceled.",
+                Id = id
+            };
+        }
     }
 }

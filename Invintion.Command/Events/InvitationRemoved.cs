@@ -1,14 +1,14 @@
 ﻿namespace Invitation.Command.Events
 {
-    public record InvitationCanceled(
+    public record InvitationRemoved(
          string AggregateId,
          int Sequence,
          DateTime DateTime,
-         InvitationCanceledData Data,
+         InvitationRemovedData Data,
          int Version
-     ) : Event<InvitationCanceledData>(AggregateId, Sequence, DateTime, Data, Version);
+     ) : Event<InvitationRemovedData>(AggregateId, Sequence, DateTime, Data, Version);
 
-    public record InvitationCanceledData(
+    public record InvitationRemovedData(
     string UserId,
     string SubscriptionId,
     string MemberId,

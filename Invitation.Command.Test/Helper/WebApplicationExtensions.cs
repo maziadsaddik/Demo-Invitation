@@ -28,7 +28,6 @@ namespace Invitation.Command.Test.Helper
 
         public static GrpcChannel CreateGrpcChannel(this WebApplicationFactory<Program> factory)
         {
-
             var client = factory.CreateDefaultClient();
             return GrpcChannel.ForAddress(
                 client.BaseAddress ?? throw new InvalidOperationException("BaseAddress is null"),

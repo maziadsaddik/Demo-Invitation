@@ -1,8 +1,8 @@
 ﻿using MediatR;
 
-namespace Invitation.Command.CommandHandlers.Accept
+namespace Invitation.Command.CommandHandlers.Leave
 {
-    public record AcceptInvitationCommand
+    public record LeaveInvitationCommand
     (
         string accountId,
         string subscriptionId,

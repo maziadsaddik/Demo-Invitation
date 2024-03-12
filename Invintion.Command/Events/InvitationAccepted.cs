@@ -10,7 +10,7 @@
 
     public record InvitationAcceptedData(
     string UserId,
-    string? SubscriptionId,
+    string SubscriptionId,
     string MemberId,
     string AccountId
     );

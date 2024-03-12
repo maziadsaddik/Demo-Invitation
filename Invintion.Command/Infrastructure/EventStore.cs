@@ -29,14 +29,11 @@ namespace Invitation.Command.Infrastructure
             await _context.Events.AddRangeAsync(events, cancellationToken);
             await _context.OutboxMessages.AddRangeAsync(messages, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
-
         }
-        public Task<Event?> GetLastEventByAggregateId(string aggregateId)
-        {
-           return  _context.Events
-                   .Where(@event => @event.AggregateId == aggregateId)
-                   .OrderBy(@event => @event.Sequence).LastOrDefaultAsync();
-        }
+        public Task<List<Event>> GetLastEventByAggregateId(string aggregateId) => _context.Events
+            .Where(x => x.AggregateId == aggregateId)
+            .OrderBy(x => x.Id)
+            .ToListAsync();
 
         public Task<List<Event>> GetStreamAsync(string aggregateId)
         {

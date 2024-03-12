@@ -17,12 +17,12 @@ namespace Invitation.Command.Infrastructure.database
             modelBuilder.ApplyConfiguration(new GenericEventConfiguration<InvitationCanceled, InvitationCanceledData>());
             modelBuilder.ApplyConfiguration(new GenericEventConfiguration<InvitationRejected, InvitationRejectedData>());
 
-            //modelBuilder.ApplyConfiguration(new GenericEventConfiguration<JoinInvitationEventEntity, InvitationData>());
-            //modelBuilder.ApplyConfiguration(new GenericEventConfiguration<ChangePermissionsInvitationEventEntity, InvitationData>());
+            modelBuilder.ApplyConfiguration(new GenericEventConfiguration<InvitationJoined, InvitationJoinedData>());
+            modelBuilder.ApplyConfiguration(new GenericEventConfiguration<InvitationChangedPermission, InvitationChangedPermissionData>());
 
 
-            //modelBuilder.ApplyConfiguration(new GenericEventConfiguration<RemoveInvitationEventEntity, InvitationInfoData>());
-            //modelBuilder.ApplyConfiguration(new GenericEventConfiguration<LeaveInvitationEventEntity, InvitationInfoData>());
+            modelBuilder.ApplyConfiguration(new GenericEventConfiguration<InvitationRemoved, InvitationRemovedData>());
+            modelBuilder.ApplyConfiguration(new GenericEventConfiguration<InvitationLeaved, InvitationLeavedData>());
         }
     }
 }

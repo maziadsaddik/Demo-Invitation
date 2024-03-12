@@ -62,5 +62,62 @@ namespace Invitation.Command.Test.Helper
             Assert.Equal(request.MemberId, created.Data.MemberId);
             Assert.Equal(request.SubscriptionId, created.Data.SubscriptionId);
         }
+
+        public static void OfJoinedEvent(Event @event, InvitationRequest request, Response response)
+        {
+            var created = (InvitationJoined)@event;
+            Assert.Equal(response.Id, created.AggregateId.ToString());
+            Assert.Equal(request.InvitationInfo.UserId, created.Data.UserId);
+            Assert.Equal(DateTime.UtcNow, created.DateTime, TimeSpan.FromMinutes(1));
+            Assert.Equal(1, created.Sequence);
+            Assert.Equal(1, created.Version);
+            Assert.Equal(request.InvitationInfo.AccountId, created.Data.AccountId);
+            Assert.Equal(request.InvitationInfo.MemberId, created.Data.MemberId);
+            Assert.Equal(request.InvitationInfo.SubscriptionId, created.Data.SubscriptionId);
+            Assert.NotEmpty(created.Data.Permissions);
+        }
+
+        public static void OfChangedPermissionEvent(Event @event, InvitationRequest request, Response response, int expectedSequence)
+        {
+            var created = (InvitationChangedPermission)@event;
+
+            Assert.Equal(response.Id, created.AggregateId.ToString());
+            Assert.Equal(request.InvitationInfo.UserId, created.Data.UserId);
+            Assert.Equal(DateTime.UtcNow, created.DateTime, TimeSpan.FromMinutes(1));
+            Assert.Equal(expectedSequence, created.Sequence);
+            Assert.Equal(1, created.Version);
+            Assert.Equal(request.InvitationInfo.AccountId, created.Data.AccountId);
+            Assert.Equal(request.InvitationInfo.MemberId, created.Data.MemberId);
+            Assert.Equal(request.InvitationInfo.SubscriptionId, created.Data.SubscriptionId);
+            Assert.NotEmpty(created.Data.Permissions);
+        }
+
+        public static void OfRemovedEvent(Event @event, InvitationInfoRequest request, Response response, int expectedSequence)
+        {
+            var created = (InvitationRemoved)@event;
+
+            Assert.Equal(response.Id, created.AggregateId.ToString());
+            Assert.Equal(request.UserId, created.Data.UserId);
+            Assert.Equal(DateTime.UtcNow, created.DateTime, TimeSpan.FromMinutes(1));
+            Assert.Equal(expectedSequence, created.Sequence);
+            Assert.Equal(1, created.Version);
+            Assert.Equal(request.AccountId, created.Data.AccountId);
+            Assert.Equal(request.MemberId, created.Data.MemberId);
+            Assert.Equal(request.SubscriptionId, created.Data.SubscriptionId);
+        }
+
+        public static void OfLeavedEvent(Event @event, InvitationInfoRequest request, Response response, int expectedSequence)
+        {
+            var created = (InvitationLeaved)@event;
+
+            Assert.Equal(response.Id, created.AggregateId.ToString());
+            Assert.Equal(request.UserId, created.Data.UserId);
+            Assert.Equal(DateTime.UtcNow, created.DateTime, TimeSpan.FromMinutes(1));
+            Assert.Equal(expectedSequence, created.Sequence);
+            Assert.Equal(1, created.Version);
+            Assert.Equal(request.AccountId, created.Data.AccountId);
+            Assert.Equal(request.MemberId, created.Data.MemberId);
+            Assert.Equal(request.SubscriptionId, created.Data.SubscriptionId);
+        }
     }
 }

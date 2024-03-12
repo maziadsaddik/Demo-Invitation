@@ -11,6 +11,6 @@ namespace Invitation.Command.Abstractions.Persistence
         Task<List<Event>> GetStreamAsync(string aggregateId);
 
         Task CommitAsync(IAggregate aggregate, CancellationToken cancellationToken);
-        Task<Event?> GetLastEventByAggregateId(string aggregateId);
+        Task<List<Event>> GetLastEventByAggregateId(string aggregateId);
     }
 }

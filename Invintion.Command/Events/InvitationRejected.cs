@@ -10,8 +10,10 @@
 
     public record InvitationRejectedData(
     string UserId,
-    string? SubscriptionId,
+    string SubscriptionId,
     string MemberId,
     string AccountId
     );
+
+    
 }
